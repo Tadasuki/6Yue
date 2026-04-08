@@ -1,0 +1,1042 @@
+/* 重置默认样式 */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+/* 引入本地 OPPO Sans 字体 */
+@font-face {
+    font-family: 'OPPOSansLocal';
+    /* 请确保你的字体文件放在 fonts 文件夹下，并保持文件名一致（若后缀为.otf请自行修改） */
+    src: url('data/fonts/OPPOSans.ttf') format('truetype');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+/* 定义字体栈 (优先本地读取，无则用系统字体) */
+:root {
+    --font-oppo: 'OPPOSansLocal', 'OPPOSans', 'OPPO Sans', 'OPPO Sans 4.0', system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    --font-serif: 'Noto Serif SC', serif;
+    /* 新增：供设置面板动态调节的 CSS 变量 */
+    --bg-blur: 5px;
+    --widget-blur: 20px;
+    --search-blur: 20px;
+    --bm-bg-blur: 20px;
+    --modal-blur: 20px;
+    --overlay-alpha: 0.25;
+    --widget-alpha: 0.55;
+    --search-alpha: 0.35;
+    --engine-alpha: 0.85;
+    /* 引擎选单透明度 */
+    --bm-bg-alpha: 0.15;
+    /* 书签栏笼罩背景透明度 */
+    --modal-alpha: 0.85;
+    /* 设置悬浮窗透明度 */
+    --theme-rgb: 255, 255, 255;
+    /* 全局主题色：控制一切遮罩的黑与白 */
+    --text-main: #2c3e50;
+    /* 主文字颜色 */
+    --text-sub: #4a5568;
+    /* 副文字/小字颜色 */
+    --text-shadow-rgb: 255, 255, 255;
+    /* 文字描边发光颜色 */
+}
+
+body {
+    /* 全局基调使用优雅的思源宋体 */
+    font-family: var(--font-serif);
+    /* 默认必应壁纸兜底，稍后 JS 会请求最新的 JSON 壁纸进行覆盖 */
+    background: url('https://bing.biturl.top/?resolution=1920&format=image&index=0&mkt=zh-CN') center center / cover no-repeat fixed;
+    color: var(--text-main);
+    height: 100vh;
+    display: flex;
+    /* 使用弹性盒子布局 */
+    overflow: hidden;
+    /* 防止页面滚动 */
+    /* 让文字渲染更加平滑清晰 */
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+/* 全局遮罩：加深暗度并添加模糊，让背景彻底变成点缀 */
+body::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(var(--theme-rgb), var(--overlay-alpha));
+    backdrop-filter: blur(var(--bg-blur));
+    /* 使用变量控制壁纸模糊 */
+    -webkit-backdrop-filter: blur(var(--bg-blur));
+    z-index: -1;
+}
+
+/* 天气小部件 */
+.weather-widget {
+    position: absolute;
+    top: 30px;
+    right: 30px;
+    /* 改到右上角 */
+    background: rgba(var(--theme-rgb), var(--widget-alpha));
+    backdrop-filter: blur(var(--widget-blur));
+    /* 统一增强玻璃质感 */
+    -webkit-backdrop-filter: blur(var(--widget-blur));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    /* 玻璃反光边缘 */
+    padding: 12px 24px;
+    border-radius: 20px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    font-weight: 600;
+    font-family: var(--font-oppo);
+    /* 将天气字体改为现代无衬线体 */
+    font-size: 1.1rem;
+    z-index: 10;
+    /* 确保它在最上层 */
+    text-decoration: none;
+    /* 去除超链接下划线 */
+    color: var(--text-main);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.weather-widget:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: rgba(var(--theme-rgb), 0.8);
+    color: #005a9e;
+}
+
+/* 主页左上角的大时钟面板 (结合毛玻璃与绝对定位) */
+.main-clock {
+    position: absolute;
+    top: 30px;
+    left: 30px;
+    /* 改到左上角 */
+    background: rgba(var(--theme-rgb), var(--widget-alpha));
+    backdrop-filter: blur(var(--widget-blur));
+    -webkit-backdrop-filter: blur(var(--widget-blur));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 12px 20px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    z-index: 10;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* 侧栏时钟背景框 (共用毛玻璃设计) */
+.detailed-clock {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    background: rgba(var(--theme-rgb), 0.4);
+    padding: 12px 15px;
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+}
+
+/* 呼吸闪烁动画 (用于时钟冒号) */
+.blink {
+    animation: blinker 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes blinker {
+    50% {
+        opacity: 0.15;
+    }
+}
+
+/* 中间主内容区 */
+.main-content {
+    flex: 1;
+    /* 占据剩余的所有空间 */
+    position: relative;
+    /* 核心：让内部的时钟和天气相对于主区域定位，彻底防止和侧边栏重叠 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    /* 改变对齐方式，防止底部内容过多时顶部被推出屏幕 */
+    padding: 18vh 20px 40px 20px;
+    /* 顶部留出 ()vh 空间，让搜索框在视觉上完美居中 */
+    overflow-y: auto;
+    /* 允许核心区在内容过多时独立上下滚动 */
+    overflow-x: hidden;
+}
+
+/* Logo 样式 */
+.logo {
+    max-width: 550px;
+    /* 在这里修改数值来放大 Logo */
+    height: auto;
+    margin-bottom: 30px;
+    /* 与下方搜索框保持距离 */
+    object-fit: contain;
+    /* 利用 drop-shadow 贴合图片轮廓生成一圈白色描边和发光，让 Logo 更立体显眼 */
+    filter: drop-shadow(0 0 20px rgba(255, 255, 255, 0.5)) drop-shadow(0 0 50px rgba(255, 255, 255, 0.5));
+}
+
+/* 搜索框 */
+.search-box {
+    position: relative;
+    /* 修复下拉菜单被书签挡住的问题 */
+    z-index: 50;
+    /* 确保搜索栏浮在书签栏上方 */
+    display: flex;
+    align-items: center;
+    /* 让内部悬浮元素居中 */
+    width: 100%;
+    max-width: 800px;
+    /* 搜索栏长度 (原来是 650px) */
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 40px;
+    /* 整体圆角变大 */
+    padding: 8px;
+    /* 重点：给内部留出边距，制造悬浮感 */
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+    overflow: visible;
+    /* 改为 visible，让下拉菜单能正常弹出来 */
+    margin-bottom: 50px;
+    transition: box-shadow 0.3s ease;
+}
+
+.search-box::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(var(--theme-rgb), var(--search-alpha));
+    backdrop-filter: blur(var(--search-blur));
+    -webkit-backdrop-filter: blur(var(--search-blur));
+    z-index: -1;
+}
+
+/* 自定义搜索引擎下拉菜单 (内部悬浮胶囊) */
+.engine-dropdown {
+    position: relative;
+    /* 作为引擎下拉菜单的定位锚点 */
+    display: flex;
+    align-items: center;
+    height: 46px;
+    /* 固定高度 */
+    background: rgba(var(--theme-rgb), var(--engine-alpha));
+    /* 绑定主题与独立透明度 */
+    padding: 0 16px;
+    cursor: pointer;
+    border-radius: 30px;
+    /* 独立的圆角胶囊 */
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    /* 适配黑/白背景的通用中性边框 */
+    margin-right: 10px;
+    /* 与输入框隔开距离 */
+    transition: background 0.3s;
+}
+
+.engine-dropdown:hover {
+    background: rgba(var(--theme-rgb), 0.95);
+}
+
+.current-engine {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.current-engine img {
+    width: 22px;
+    height: 22px;
+}
+
+.current-engine .arrow {
+    font-size: 0.7rem;
+    color: var(--text-sub);
+}
+
+.engine-list {
+    position: absolute;
+    top: calc(100% + 12px);
+    /* 紧贴引擎胶囊下方弹出 */
+    bottom: auto;
+    left: 0;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    list-style: none;
+    border-radius: 24px;
+    /* 选单圆角变大 */
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    padding: 15px;
+    overflow: hidden;
+    /* 裁剪 ::before 伪元素，使其在父元素边界内 */
+    display: none;
+    /* 默认隐藏 */
+    flex-direction: row;
+    /* 将 ico 横向排列 */
+    flex-wrap: wrap;
+    /* 空间不足时自动换行 */
+    width: max-content;
+    max-width: 230px;
+    /* 限制最大宽度，使其形成紧凑的网格 */
+    gap: 12px;
+    z-index: 110;
+    /* 确保层级在上 (above)，覆盖 100 的候选词框 */
+}
+
+.engine-list::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* 继承父元素的圆角 */
+    background: rgba(var(--theme-rgb), var(--engine-alpha));
+    backdrop-filter: blur(var(--search-blur));
+    -webkit-backdrop-filter: blur(var(--search-blur));
+    z-index: -1;
+}
+
+.engine-list.show {
+    display: flex;
+    /* 添加 show 类时显示 */
+}
+
+.engine-list li {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    transition: background 0.2s;
+}
+
+.engine-list li:hover {
+    background: rgba(128, 128, 128, 0.2);
+    /* 适配黑白遮罩的中性悬浮色 */
+}
+
+.engine-list img {
+    width: 24px;
+    height: 24px;
+}
+
+.search-box:focus-within {
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.15);
+    /* 鼠标点击时阴影加深 */
+}
+
+.search-box input {
+    flex: 1;
+    padding: 10px 15px;
+    border: none;
+    outline: none;
+    font-size: 1.2rem;
+    font-family: var(--font-oppo);
+    /* 输入内容使用现代字体 */
+    background: transparent;
+    color: var(--text-main);
+    /* 绑定主文字颜色以适配深色/浅色背景 */
+}
+
+/* 搜索按键 (内部悬浮胶囊) */
+.search-box button {
+    height: 46px;
+    padding: 0 30px;
+    border: none;
+    background: rgba(0, 120, 212, 0.85);
+    /* 微软蓝带点透明，融入整体风格 */
+    backdrop-filter: blur(5px);
+    color: white;
+    font-size: 1.1rem;
+    font-weight: 600;
+    font-family: var(--font-oppo);
+    cursor: pointer;
+    border-radius: 30px;
+    /* 独立的圆角胶囊 */
+    margin-left: 10px;
+    /* 与输入框隔开距离 */
+    transition: background 0.3s;
+}
+
+/* 搜索候选词下拉悬浮框 */
+.search-suggestions {
+    position: absolute;
+    top: calc(100% + 12px);
+    /* 悬浮在搜索框正下方 */
+    left: 0;
+    width: 100%;
+    border: 1px solid rgba(128, 128, 128, 0.3);
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+    list-style: none;
+    padding: 10px 0;
+    overflow: hidden;
+    /* 裁剪 ::before 伪元素，使其在父元素边界内 */
+    display: none;
+    /* 默认隐藏 */
+    z-index: 100;
+    /* 层级低于引擎选单 */
+}
+
+.search-suggestions::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    /* 继承父元素的圆角 */
+    background: rgba(var(--theme-rgb), var(--search-alpha));
+    backdrop-filter: blur(var(--search-blur));
+    -webkit-backdrop-filter: blur(var(--search-blur));
+    z-index: -1;
+}
+
+.search-suggestions li {
+    padding: 10px 25px;
+    font-family: var(--font-oppo);
+    font-size: 1.05rem;
+    color: var(--text-main);
+    /* 动态适配字体发光主题中的颜色 */
+    cursor: pointer;
+    transition: background 0.2s;
+}
+
+.search-suggestions li:hover,
+.search-suggestions li.active {
+    background: rgba(128, 128, 128, 0.2);
+    /* 兼容黑白背景的悬浮高亮色 */
+}
+
+.search-box button:hover {
+    background: #005a9e;
+}
+
+/* 书签导航分类大盘 */
+.bookmark-categories {
+    display: flex;
+    position: relative;
+    z-index: 1;
+    /* 为伪元素提供独立的层级上下文 */
+    gap: 30px;
+    width: 100%;
+    max-width: 1050px;
+    /* 让书签栏变宽，容纳更多内容 */
+    margin-top: 40px;
+    /* 让书签栏往下移动一点 */
+    justify-content: space-between;
+    flex-wrap: wrap;
+    /* 适配窄屏幕 */
+    padding: 30px 40px;
+    /* 增加内边距，撑起笼罩体积 */
+    border-radius: 24px;
+    /* 笼罩大圆角 */
+}
+
+.bookmark-categories::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    background: rgba(var(--theme-rgb), var(--bm-bg-alpha));
+    backdrop-filter: blur(var(--bm-bg-blur));
+    -webkit-backdrop-filter: blur(var(--bm-bg-blur));
+    z-index: -1;
+}
+
+.category {
+    flex: 1;
+    min-width: 200px;
+}
+
+.category h4 {
+    font-size: 1rem;
+    color: var(--text-sub);
+    margin-bottom: 12px;
+    opacity: 0.9;
+    font-weight: 900;
+    /* 思源宋体的极粗体非常有质感 */
+    border-bottom: 1px solid rgba(255, 255, 255, 0.4);
+    /* 更换为极度柔和的高斯模糊光晕 */
+    text-shadow: 0 2px 15px rgba(var(--text-shadow-rgb), 1), 0 0 5px rgba(var(--text-shadow-rgb), 0.8);
+    padding-bottom: 8px;
+}
+
+.bookmarks {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(70px, 1fr));
+    /* 自适应网格大小缩小，适配 App 图标布局 */
+    gap: 20px 10px;
+    justify-items: center;
+}
+
+.bookmark {
+    display: flex;
+    flex-direction: column;
+    /* 上下布局 */
+    align-items: center;
+    gap: 8px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+/* 类似 App 图标的圆角底座 */
+.bookmark .icon-box {
+    width: 60px;
+    height: 60px;
+    background: rgba(var(--theme-rgb), 0.65);
+    /* 内部小图标背景自适应 */
+    backdrop-filter: blur(var(--bm-bg-blur));
+    -webkit-backdrop-filter: blur(var(--bm-bg-blur));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-radius: 18px;
+    /* 平滑圆角正方形 */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: all 0.2s ease;
+}
+
+.bookmark .icon-box img {
+    width: 34px;
+    height: 34px;
+    border-radius: 6px;
+}
+
+.bookmark:hover .icon-box {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+    background: rgba(var(--theme-rgb), 0.9);
+}
+
+.bookmark .bookmark-name {
+    font-size: 0.85rem;
+    font-weight: 600;
+    font-family: var(--font-oppo);
+    /* 书签小字使用无衬线体保持清晰 */
+    color: var(--text-main);
+    /* 柔和文字底光 */
+    text-shadow: 0 1px 8px rgba(var(--text-shadow-rgb), 1), 0 1px 3px rgba(var(--text-shadow-rgb), 0.9);
+    max-width: 75px;
+    text-align: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    /* 文字过长显示省略号 */
+}
+
+/* 侧边栏 */
+.sidebar {
+    position: relative;
+    /* 核心：为了让折叠按钮能挂靠在它的右边缘 */
+    width: 400px;
+    /* 让侧边栏变宽以容纳新闻卡片 */
+    margin-left: 0;
+    /* 默认展开 */
+    border-right: 1px solid rgba(255, 255, 255, 0.4);
+    /* 边框移到右侧 */
+    padding: 30px 25px;
+    box-shadow: 5px 0 30px rgba(0, 0, 0, 0.05);
+    /* 阴影朝右打 */
+    display: flex;
+    flex-direction: column;
+    transition: margin-left 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+    /* 平滑折叠动画 */
+    z-index: 90;
+    /* 调高层级，确保在移动端覆盖搜索栏 (搜索栏为 50) */
+}
+
+.sidebar::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: rgba(var(--theme-rgb), var(--widget-alpha));
+    backdrop-filter: blur(var(--widget-blur));
+    -webkit-backdrop-filter: blur(var(--widget-blur));
+    z-index: -1;
+}
+
+/* 收起时的状态，往左移出屏幕，中间主内容区会自动填补空间 */
+.sidebar.collapsed {
+    margin-left: -400px;
+    /* 跟随宽度一并修改 */
+}
+
+/* 侧边栏折叠/展开按钮 */
+.toggle-btn {
+    position: absolute;
+    top: 50%;
+    right: -30px;
+    /* 让按钮凸出在侧边栏外面 */
+    transform: translateY(-50%);
+    width: 30px;
+    height: 60px;
+    background: rgba(var(--theme-rgb), var(--widget-alpha));
+    backdrop-filter: blur(var(--widget-blur));
+    -webkit-backdrop-filter: blur(var(--widget-blur));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    border-left: none;
+    /* 让它和侧边栏无缝衔接 */
+    border-radius: 0 15px 15px 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    color: #4a5568;
+    font-size: 1.2rem;
+    box-shadow: 5px 0 15px rgba(0, 0, 0, 0.05);
+    transition: background 0.3s, color 0.3s;
+}
+
+.toggle-btn:hover {
+    background: rgba(255, 255, 255, 0.85);
+    color: #0078d4;
+}
+
+/* 侧栏时钟与头部 */
+.sidebar-header {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+    margin-bottom: 20px;
+    border-bottom: 2px solid rgba(255, 255, 255, 0.3);
+    padding-bottom: 12px;
+}
+
+.sidebar-header h3 {
+    font-size: 1.4rem;
+    color: var(--text-main);
+}
+
+.s-time {
+    font-size: 2.2rem;
+    font-weight: 700;
+    font-family: var(--font-oppo);
+    color: var(--text-main);
+    /* 自动适配黑白背景 */
+    text-shadow: none;
+    /* 不受发光主题影响 */
+    line-height: 1;
+}
+
+.s-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.s-date {
+    font-size: 0.85rem;
+    font-family: var(--font-oppo);
+    color: var(--text-sub);
+    text-shadow: none;
+    /* 不受发光主题影响 */
+    font-weight: 600;
+}
+
+.s-lunar-fest {
+    font-size: 0.8rem;
+    font-family: var(--font-oppo);
+    color: var(--text-sub);
+    text-shadow: none;
+    /* 不受发光主题影响 */
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.festival-tag {
+    background: #ff6b6b;
+    font-family: var(--font-oppo);
+    color: white;
+    padding: 2px 6px;
+    border-radius: 6px;
+    font-size: 0.7rem;
+    font-weight: bold;
+}
+
+.festival-tag:empty {
+    display: none;
+}
+
+/* 新闻卡片流 */
+.news-list {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    /* 撑满侧边栏剩余空间 */
+    min-height: 0;
+    /* 解决 Flexbox 嵌套时内容溢出无法滚动的核心关键 */
+    gap: 20px;
+    overflow-y: auto;
+    /* 内容过多时侧栏内部可滚动 */
+    list-style: none;
+    padding-right: 5px;
+    padding-bottom: 20px;
+}
+
+/* 美化滚动条 */
+.news-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.news-list::-webkit-scrollbar-thumb {
+    background: rgba(0, 0, 0, 0.15);
+    border-radius: 3px;
+}
+
+.news-card {
+    flex-shrink: 0;
+    /* 严禁卡片被父容器强制垂直挤压，保证完整高度 */
+    background: rgba(var(--theme-rgb), 0.7);
+    border-radius: 16px;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.news-card:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+}
+
+.news-card a {
+    display: block;
+    text-decoration: none;
+    color: inherit;
+}
+
+.news-card img {
+    width: 100%;
+    height: 150px;
+    object-fit: cover;
+    display: block;
+}
+
+.news-card .news-content {
+    padding: 15px;
+}
+
+.news-card h4 {
+    font-size: 1.05rem;
+    color: var(--text-main);
+    margin-bottom: 8px;
+    line-height: 1.4;
+}
+
+.news-card p {
+    font-size: 0.85rem;
+    font-family: var(--font-oppo);
+    color: var(--text-sub);
+    line-height: 1.5;
+    /* 多行文本截断，超出2行显示省略号 */
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* ====================
+   悬浮工具栏与设置面板
+   ==================== */
+.floating-tools {
+    position: absolute;
+    bottom: 30px;
+    right: 30px;
+    display: flex;
+    gap: 15px;
+    z-index: 100;
+}
+
+.tool-btn {
+    background: rgba(var(--theme-rgb), var(--widget-alpha));
+    backdrop-filter: blur(var(--widget-blur));
+    -webkit-backdrop-filter: blur(var(--widget-blur));
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    padding: 12px 18px;
+    border-radius: 16px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    font-family: var(--font-oppo);
+    font-size: 0.95rem;
+    /* 强制统一字体大小，修复 a 标签与 button 大小不一的问题 */
+    font-weight: 600;
+    color: var(--text-main);
+    cursor: pointer;
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+}
+
+.tool-btn:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+    background: rgba(var(--theme-rgb), 0.85);
+}
+
+/* 设置悬浮框配置 */
+.settings-modal {   
+    position: absolute;
+    bottom: 90px;
+    right: 30px;
+    width: 460px;
+    /* 加宽设置悬浮窗 */
+    max-width: 90vw;
+    /* 适配移动端窄屏幕，防止超出屏幕边缘 */
+    background: rgba(var(--theme-rgb), var(--modal-alpha));
+    backdrop-filter: blur(var(--modal-blur));
+    /* 强制悬浮窗使用毛玻璃 */
+    -webkit-backdrop-filter: blur(var(--modal-blur));
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 20px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.15);
+    max-height: 80vh;
+    /* 防止选项太多超出屏幕 */
+    overflow-y: auto;
+    padding: 20px;
+    z-index: 101;
+    display: none;
+    /* 默认隐藏 */
+    flex-direction: column;
+    gap: 15px;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+.settings-modal.show {
+    display: flex;
+    opacity: 1;
+    transform: translateY(0);
+}
+
+/* 屏幕居中的悬浮窗 (用于书签与分类的编辑) */
+.centered-modal {
+    top: 50%;
+    left: 50%;
+    bottom: auto;
+    right: auto;
+    transform: translate(-50%, -45%);
+    z-index: 1000;
+    /* 确保在最顶层 */
+}
+
+.centered-modal.show {
+    transform: translate(-50%, -50%);
+}
+
+.settings-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    padding-bottom: 10px;
+}
+
+.settings-header h4 {
+    font-family: var(--font-oppo);
+    color: var(--text-main);
+    font-size: 1.1rem;
+}
+
+.settings-header button {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: var(--text-sub);
+    cursor: pointer;
+}
+
+.setting-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.setting-item label {
+    font-family: var(--font-oppo);
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    font-weight: bold;
+}
+
+.setting-item input[type="range"] {
+    width: 100%;
+    cursor: pointer;
+}
+
+.setting-item input[type="text"],
+.setting-item input[type="url"],
+.setting-item select {
+    padding: 6px 10px;
+    border-radius: 8px;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    font-family: var(--font-oppo);
+    outline: none;
+    background: rgba(var(--theme-rgb), 0.8);
+    color: var(--text-main);
+    font-size: 0.9rem;
+    /* 统一输入框与下拉框字体大小 */
+}
+
+/* 统一设置面板和书签管理面板中的按钮样式 (主按钮与次按钮) */
+.modal-btn-primary,
+.modal-btn-secondary {
+    padding: 8px 15px;
+    border-radius: 8px;
+    font-family: var(--font-oppo);
+    font-size: 0.9rem;
+    font-weight: bold;
+    cursor: pointer;
+    text-align: center;
+    display: inline-block;
+    transition: all 0.2s ease;
+    box-sizing: border-box;
+    line-height: 1.5;
+}
+
+.modal-btn-primary {
+    background: rgba(0, 120, 212, 0.85);
+    color: white;
+    border: none;
+}
+
+.modal-btn-primary:hover {
+    background: #005a9e;
+}
+
+.modal-btn-secondary {
+    background: rgba(var(--theme-rgb), 0.8);
+    color: var(--text-main);
+    border: 1px solid rgba(128, 128, 128, 0.2);
+}
+
+.modal-btn-secondary:hover {
+    background: rgba(128, 128, 128, 0.2);
+}
+
+/* 底部版权信息 (左下角) */
+.copyright {
+    align-self: flex-start;
+    /* 靠主区域的左边缘 */
+    margin-top: auto;
+    /* 利用弹性盒子自动推到最下方 */
+    padding-top: 60px;
+    /* 与上方书签保持充分距离 */
+    font-family: var(--font-oppo);
+    font-size: 0.85rem;
+    color: var(--text-main);
+    text-shadow: 0 1px 8px rgba(var(--text-shadow-rgb), 1), 0 1px 3px rgba(var(--text-shadow-rgb), 0.9);
+}
+
+.copyright a {
+    color: #0078d4;
+    text-decoration: none;
+    font-weight: 600;
+}
+
+.copyright a:hover {
+    text-decoration: underline;
+}
+
+/* ====================
+   新增：二级选项卡与书签管理列表样式
+   ==================== */
+.modal-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 15px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    padding-bottom: 10px;
+    overflow-x: auto;
+}
+
+.tab-btn {
+    background: none;
+    border: none;
+    font-family: var(--font-oppo);
+    font-size: 0.9rem;
+    color: var(--text-sub);
+    cursor: pointer;
+    padding: 6px 10px;
+    border-radius: 8px;
+    white-space: nowrap;
+}
+
+.tab-btn.active {
+    background: rgba(0, 120, 212, 0.1);
+    color: #0078d4;
+    font-weight: bold;
+}
+
+.tab-pane {
+    display: none;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.tab-pane.active {
+    display: flex;
+}
+
+.bm-mg-group {
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 10px;
+}
+
+.bm-mg-cat {
+    background: rgba(0, 0, 0, 0.04);
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-weight: bold;
+    font-family: var(--font-oppo);
+    font-size: 0.9rem;
+}
+
+.bm-mg-item {
+    padding: 8px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(0, 0, 0, 0.05);
+    font-family: var(--font-oppo);
+    font-size: 0.85rem;
+}
+
+.bm-mg-item img {
+    width: 16px;
+    height: 16px;
+    border-radius: 3px;
+    margin-right: 8px;
+    vertical-align: middle;
+}
+
+.bm-mg-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.bm-action-btn {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: var(--text-sub);
+    font-size: 1rem;
+    padding: 2px;
+}
+
+.bm-action-btn:hover {
+    color: #0078d4;
+}
+
+.bm-action-btn.del:hover {
+    color: #e53e3e;
+}

@@ -1,0 +1,136 @@
+/* ====================
+   移动端响应式适配 (手机屏幕)
+   ==================== */
+@media (max-width: 768px) {
+    /* 侧边栏改为绝对定位的悬浮抽屉 */
+    .sidebar {
+        position: absolute;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 320px;
+        padding: 20px 15px;
+        box-shadow: 10px 0 30px rgba(0,0,0,0.2);
+    }
+    
+    .sidebar.collapsed {
+        margin-left: -320px; /* 收起时的偏移量跟随手机端宽度调整 */
+    }
+    
+    /* 稍微调大折叠按钮，方便手机触屏点击 */
+    .toggle-btn {
+        width: 35px;
+        height: 70px;
+        right: -35px;
+        border-radius: 0 18px 18px 0;
+    }
+
+    /* 主内容区适配：解除垂直居中，改为顶部对齐以方便滚动 */
+    .main-content {
+        justify-content: flex-start;
+        padding: 100px 15px 40px 15px; /* 顶部留足空间给时钟和天气 */
+        overflow-y: auto; /* 允许核心区在屏幕过矮时独立上下滚动 */
+        overflow-x: hidden;
+    }
+
+    /* 顶部时钟与天气适配：缩小体积与间距 */
+    .main-clock {
+        top: 15px;
+        left: 15px;
+        padding: 8px 12px;
+        border-radius: 12px;
+    }
+    .main-clock .s-info {
+        display: none; /* 手机端主页隐藏时钟的详细日期，保持精简 */
+    }
+    .main-clock .s-time {
+        font-size: 1.5rem;
+    }
+    
+    .weather-widget {
+        top: 15px;
+        right: 15px;
+        padding: 8px 12px;
+        font-size: 0.9rem;
+        border-radius: 12px;
+    }
+
+    /* Logo与搜索框适配 */
+    .logo {
+        max-width: 360px; /* 调整手机端 Logo 的大小 */
+        margin-bottom: 20px;
+    }
+    
+    .search-box {
+        padding: 5px;
+        border-radius: 25px;
+        margin-bottom: 30px;
+    }
+    
+    .engine-dropdown {
+        height: 38px;
+        padding: 0 10px;
+        margin-right: 5px;
+    }
+    
+    .current-engine img {
+        width: 18px;
+        height: 18px;
+    }
+    
+    .search-box input {
+        font-size: 1rem;
+        padding: 5px 8px;
+    }
+    
+    .search-box button {
+        height: 38px;
+        padding: 0 15px;
+        font-size: 0.95rem;
+    }
+
+    /* 书签分类盘改为单列堆叠排布 */
+    .bookmark-categories {
+        flex-direction: column;
+        gap: 25px;
+        margin-top: 10px;
+        padding: 20px 15px; /* 移动端缩小笼罩的内边距 */
+        border-radius: 18px;
+    }
+    
+    .bookmarks {
+        grid-template-columns: repeat(auto-fill, minmax(65px, 1fr)); /* 网格缩小 */
+        gap: 15px 10px;
+    }
+    
+    .bookmark .icon-box {
+        width: 50px;
+        height: 50px;
+        border-radius: 14px;
+    }
+    
+    .bookmark .icon-box img {
+        width: 28px;
+        height: 28px;
+    }
+    
+    .bookmark .bookmark-name {
+        font-size: 0.75rem;
+        max-width: 60px;
+    }
+
+    /* 悬浮工具栏和设置面板的移动端适配 */
+    .floating-tools {
+        bottom: 20px;
+        right: 20px;
+        gap: 10px;
+    }
+    .tool-btn {
+        padding: 10px 14px;
+        font-size: 0.9rem;
+    }
+    .settings-modal {
+        right: 20px;
+        bottom: 70px;
+    }
+}

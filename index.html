@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>悦页 | 茶闲时</title>
+    <!-- 引入 CSS 样式表 -->
+    <link rel="stylesheet" href="style.css">
+    <!-- 引入独立移动端适配样式 -->
+    <link rel="stylesheet" href="mobile.css">
+    <!-- 引入谷歌思源宋体 (Noto Serif SC) 且经过切片加速 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+SC:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- 网站小图标 -->
+    <link rel="icon" type="image/x-icon" href="data/img/favicon.png">
+</head>
+
+<body>
+
+    <!-- 左侧：侧边栏新闻流 (移到了 main 的前面，弹性盒子会自动将其放在左边) -->
+    <aside class="sidebar" id="sidebar">
+        <!-- 展开/收起按钮 -->
+        <div class="toggle-btn" id="toggle-btn">❮</div>
+
+        <!-- 侧边栏头部：标题与时钟面板 -->
+        <div class="sidebar-header">
+            <h3>今日资讯</h3>
+            <div class="detailed-clock">
+                <div class="s-time">00:00</div>
+                <div class="s-info">
+                    <div class="s-date">2024年01月01日 星期一</div>
+                    <div class="s-lunar-fest">
+                        <span class="s-lunar">农历获取中...</span>
+                        <span class="s-festival festival-tag"></span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <ul class="news-list" id="news-list">
+            <!-- 这里将由 news.js 动态填写真实的新闻卡片 -->
+        </ul>
+    </aside>
+
+    <!-- 中间：核心内容区 -->
+    <main class="main-content">
+        <!-- 左上角：主时钟面板 (移入主区域) -->
+        <div class="main-clock" id="main-clock">
+            <div class="s-time">00:00</div>
+            <div class="s-info">
+                <div class="s-date">2024年01月01日 星期一</div>
+                <div class="s-lunar-fest">
+                    <span class="s-lunar">农历获取中...</span>
+                    <span class="s-festival festival-tag"></span>
+                </div>
+            </div>
+        </div>
+
+        <!-- 右上角：天气小部件 (移入主区域) -->
+        <a href="http://www.weather.com.cn/weather1d/101200101.shtml" target="_blank" class="weather-widget"
+            id="weather">
+            正在获取天气...
+        </a>
+
+        <!-- 居中 Logo (请将 src 替换为你自己的图片路径，例如 "logo.png") -->
+        <img src="data/img/noodles.png" width="1000" height="1000" alt="6Yue" class="logo">
+
+        <!-- 搜索栏 (支持多搜索引擎切换) -->
+        <form class="search-box" id="search-form" action="https://www.ecosia.org/search" method="GET">
+            <!-- 自定义下拉菜单 -->
+            <div class="engine-dropdown" id="engine-dropdown">
+                <div class="current-engine" id="current-engine">
+                    <img src="https://www.ecosia.org/favicon.ico" alt="Ecosia">
+                    <span class="arrow">▼</span>
+                </div>
+                <ul class="engine-list" id="engine-list">
+                    <li data-action="https://www.ecosia.org/search" data-param="q" data-name="Ecosia" title="Ecosia">
+                        <img src="https://www.ecosia.org/favicon.ico" alt="Ecosia">
+                    </li>
+                    <li data-action="https://www.google.com/search" data-param="q" data-name="Google" title="Google">
+                        <img src="https://www.google.com/favicon.ico" alt="Google">
+                    </li>
+                    <li data-action="https://www.bing.com/search" data-param="q" data-name="必应" title="必应"><img
+                            src="https://www.bing.com/favicon.ico" alt="Bing"></li>
+                    <li data-action="https://www.baidu.com/s" data-param="wd" data-name="百度" title="百度"><img
+                            src="https://www.baidu.com/favicon.ico" alt="Baidu"></li>
+                    <li data-action="https://search.brave.com/search" data-param="q" data-name="Brave" title="Brave">
+                        <img src="https://brave.com/favicon.ico" alt="Brave">
+                    </li>
+                    <li data-action="https://duckduckgo.com/" data-param="q" data-name="DuckDuckGo" title="DuckDuckGo">
+                        <img src="https://duckduckgo.com/favicon.ico" alt="DuckDuckGo">
+                    </li>
+                    <li data-action="https://search.naver.com/search.naver" data-param="query" data-name="Naver"
+                        title="Naver"><img src="https://www.naver.com/favicon.ico" alt="Naver"></li>
+                    <li data-action="https://yandex.com/search" data-param="text" data-name="Yandex" title="Yandex"><img
+                            src="https://yandex.com/favicon.ico" alt="Yandex"></li>
+                    <li data-action="https://www.wolframalpha.com/input" data-param="i" data-name="WolframAlpha"
+                        title="WolframAlpha"><img src="https://img.icons8.com/?size=512&id=13667&format=png"
+                            alt="WolframAlpha"></li>
+                </ul>
+            </div>
+
+            <input type="text" id="search-input" name="q" placeholder="输入关键词以使用Ecosia进行搜索..." autocomplete="on"
+                autofocus>
+            <button type="submit">搜索</button>
+
+            <!-- 搜索候选词下拉框 -->
+            <ul class="search-suggestions" id="search-suggestions"></ul>
+        </form>
+
+        <!-- 下方：分类书签/网址导航 -->
+        <div class="bookmark-categories" id="bookmark-container">
+            <!-- 书签将由 js/bookmarks.js 动态生成并注入到这里 -->
+        </div>
+
+        <!-- 底部版权信息 -->
+        <div class="copyright">
+            &copy; 2026 <a href="https://github.com/Tadasuki" target="_blank">守泫齋 茶閑時</a>. All rights reserved. <br>
+            Made by <a href="https://deepmind.google/models/gemini/pro/" target="_blank">Gemini 3.1 Pro</a>, <a href="https://openai.com/index/introducing-gpt-5-3-codex/" target="_blank">GPT-5.3-Codex</a>, and <a
+                href="https://www.anthropic.com/claude/opus" target="_blank">Claude Opus 4.6</a>. <br>Powered by <a
+                href="https://github.com/" target="_blank">GitHub</a> and <a href="https://cloudflare.com"
+                target="_blank">Cloudflare</a>.
+        </div>
+    </main>
+
+    <!-- 悬浮工具栏 (右下角) -->
+    <div class="floating-tools">
+        <a href="https://peapix.com/bing/jp" target="_blank" class="tool-btn" title="查看壁纸详情">🖼️ 壁纸</a>
+        <button class="tool-btn" id="manage-bm-btn" title="管理我的书签">🔖 书签</button>
+        <button class="tool-btn" id="settings-btn" title="页面个性化设置">⚙️ 设置</button>
+    </div>
+
+    <!-- 设置悬浮窗口 (默认隐藏) -->
+    <div class="settings-modal" id="settings-modal">
+        <div class="settings-header">
+            <h4>个性化设置</h4>
+            <button id="close-settings">×</button>
+        </div>
+        <div class="settings-body">
+            <div class="modal-tabs" id="setting-tabs">
+                <button class="tab-btn active" data-target="tab-global">全局</button>
+                <button class="tab-btn" data-target="tab-opacity">遮罩</button>
+                <button class="tab-btn" data-target="tab-blur">模糊</button>
+                <button class="tab-btn" data-target="tab-sys">系统</button>
+                <button class="tab-btn" data-target="tab-api">密钥</button>
+                <button class="tab-btn" data-target="tab-data">备份</button>
+            </div>
+
+            <!-- 全局选项卡 -->
+            <div class="tab-pane active" id="tab-global">
+                <div class="setting-item">
+                    <label>全局主题基调</label>
+                    <select id="global-theme-select">
+                        <option value="light">浅色模式 (白底笼罩 + 黑字白边)</option>
+                        <option value="dark">深色模式 (黑底遮罩 + 白字黑边)</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 遮罩(不透明度)选项卡 -->
+            <div class="tab-pane" id="tab-opacity">
+                <div class="setting-item">
+                    <label>全局遮罩浓度 (壁纸层)</label>
+                    <input type="range" id="overlay-alpha-slider" min="0" max="1" step="0.05" value="0.25">
+                </div>
+                <div class="setting-item">
+                    <label>部件不透明度 (侧栏/时钟)</label>
+                    <input type="range" id="widget-alpha-slider" min="0" max="1" step="0.05" value="0.55">
+                </div>
+                <div class="setting-item">
+                    <label>搜索框不透明度</label>
+                    <input type="range" id="search-alpha-slider" min="0" max="1" step="0.05" value="0.35">
+                </div>
+                <div class="setting-item">
+                    <label>搜索引擎选单不透明度</label>
+                    <input type="range" id="engine-alpha-slider" min="0" max="1" step="0.05" value="0.85">
+                </div>
+                <div class="setting-item">
+                    <label>书签大盘不透明度</label>
+                    <input type="range" id="bm-alpha-slider" min="0" max="1" step="0.05" value="0.15">
+                </div>
+                <div class="setting-item">
+                    <label>设置与悬浮窗不透明度</label>
+                    <input type="range" id="modal-alpha-slider" min="0" max="1" step="0.05" value="0.85">
+                </div>
+            </div>
+
+            <!-- 模糊选项卡 -->
+            <div class="tab-pane" id="tab-blur">
+                <div class="setting-item">
+                    <label>壁纸模糊程度</label>
+                    <input type="range" id="bg-blur-slider" min="0" max="50" value="5">
+                </div>
+                <div class="setting-item">
+                    <label>部件模糊程度 (侧栏/时钟/按钮)</label>
+                    <input type="range" id="widget-blur-slider" min="0" max="50" value="20">
+                </div>
+                <div class="setting-item">
+                    <label>搜索区域模糊程度 (搜索框/下拉选单)</label>
+                    <input type="range" id="search-blur-slider" min="0" max="50" value="20">
+                </div>
+                <div class="setting-item">
+                    <label>书签大盘模糊程度</label>
+                    <input type="range" id="bm-blur-slider" min="0" max="50" value="20">
+                </div>
+                <div class="setting-item">
+                    <label>设置与悬浮窗模糊程度</label>
+                    <input type="range" id="modal-blur-slider" min="0" max="50" value="20">
+                </div>
+            </div>
+
+            <!-- 系统选项卡 -->
+            <div class="tab-pane" id="tab-sys">
+                <div class="setting-item">
+                    <label>显示时区</label>
+                    <select id="timezone-select">
+                        <option value="local">自动 (本地时间)</option>
+                        <option value="Asia/Shanghai">北京时间 (UTC+8)</option>
+                        <option value="Asia/Tokyo">东京-首尔时间 (UTC+9)</option>
+                        <option value="Etc/UTC">协调世界时 (UTC)</option>
+                        <option value="Europe/London">伦敦时间 (UTC+0/1)</option>
+                        <option value="America/New_York">纽约时间 (UTC-4/5)</option>
+                        <option value="America/Los_Angeles">洛杉矶时间 (UTC-7/8)</option>
+                    </select>
+                </div>
+                <div class="setting-item">
+                    <label>天气预报城市代码 (adcode)</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="weather-city-input" placeholder="例如：420100 (武汉市)" style="flex: 1;">
+                        <button id="weather-city-confirm" class="modal-btn-primary">确认</button>
+                    </div>
+                    <span
+                        style="font-size: 0.75rem; color: #718096; margin-top: 4px;">下方可快速查询城市编码：<br>（若只精确到省、市级，请在后面补0至满6位）</span>
+                    <div style="display: flex; flex-direction: column; gap: 5px; margin-top: 5px;">
+                        <select id="prov-select" style="flex: 1;">
+                            <option value="">省份</option>
+                        </select>
+                        <select id="city-select" style="flex: 1;">
+                            <option value="">城市</option>
+                        </select>
+                        <select id="county-select" style="flex: 1;">
+                            <option value="">区县</option>
+                        </select>
+                    </div>
+                </div>
+            </div>
+
+            <!-- API 密钥配置选项卡 -->
+            <div class="tab-pane" id="tab-api">
+                <div class="setting-item">
+                    <label>高德 Web API Key</label>
+                    <input type="text" id="amap-key-input" placeholder="请输入你的高德 Key">
+                </div>
+                <div class="setting-item">
+                    <label>高德安全密钥 (securityJsCode)</label>
+                    <input type="text" id="amap-security-input" placeholder="请输入你的 securityJsCode">
+                </div>
+                <div class="setting-item">
+                    <div style="display: flex; gap: 10px;">
+                        <button id="save-amap-config" class="modal-btn-primary" style="flex:1;">保存并生效</button>
+                        <a href="docs/amap-key-setup.html" target="_blank" class="modal-btn-secondary" style="flex:1;">配置教程</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 数据备份选项卡 -->
+            <div class="tab-pane" id="tab-data">
+                <div class="setting-item">
+                    <label>界面配置备份与恢复</label>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="export-settings-btn" class="modal-btn-secondary" style="flex:1;">导出配置</button>
+                        <label for="import-settings-input" class="modal-btn-secondary" style="flex:1;">导入配置</label>
+                        <input type="file" id="import-settings-input" accept=".json" style="display: none;">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 书签管理悬浮窗口 (默认隐藏) -->
+    <div class="settings-modal" id="bookmark-modal">
+        <div class="settings-header">
+            <h4>书签管理</h4>
+            <button id="close-bookmark-modal">×</button>
+        </div>
+        <div class="settings-body">
+            <div class="modal-tabs" id="bookmark-tabs">
+                <button class="tab-btn active" data-target="tab-bm-add">添加</button>
+                <button class="tab-btn" data-target="tab-bm-manage">管理</button>
+                <button class="tab-btn" data-target="tab-bm-data">备份</button>
+            </div>
+
+            <!-- 添加书签 -->
+            <form class="tab-pane active" id="tab-bm-add">
+                <div class="setting-item"><label>书签名称</label><input type="text" id="bm-name" required
+                        placeholder="例如：我的博客"></div>
+                <div class="setting-item"><label>网址 (URL)</label><input type="url" id="bm-url" required
+                        placeholder="https://..."></div>
+                <div class="setting-item"><label>自定义图标 URL (可选)</label><input type="url" id="bm-icon"
+                        placeholder="留空则自动获取"></div>
+                <div class="setting-item"><label>归属分类</label><select id="bm-category-select"></select><input type="text"
+                        id="bm-new-category" placeholder="或输入全新的分类名称..." style="margin-top: 5px;"></div>
+                <button type="submit" class="modal-btn-primary" style="margin-top: 10px;">添加至主页</button>
+            </form>
+
+            <!-- 管理已有书签 (动态列表) -->
+            <div class="tab-pane" id="tab-bm-manage" style="max-height: 40vh; overflow-y: auto; padding-right: 5px;">
+                <div id="bm-manager-list"></div>
+            </div>
+
+            <!-- 导入导出 -->
+            <div class="tab-pane" id="tab-bm-data">
+                <div class="setting-item" style="flex-direction: row; gap: 10px;">
+                    <button id="export-bm-btn" class="modal-btn-secondary" style="flex:1;">导出备份</button>
+                    <label for="import-bm-input" class="modal-btn-secondary" style="flex:1;">导入配置</label>
+                    <input type="file" id="import-bm-input" accept=".json" style="display: none;">
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 编辑书签悬浮窗口 (居中) -->
+    <div class="settings-modal centered-modal" id="edit-bm-modal">
+        <div class="settings-header">
+            <h4>编辑书签</h4>
+            <button id="close-edit-bm-modal">×</button>
+        </div>
+        <div class="settings-body">
+            <form id="edit-bm-form" class="setting-item" style="margin-bottom: 5px;">
+                <input type="hidden" id="edit-bm-cidx">
+                <input type="hidden" id="edit-bm-bidx">
+                <label>书签名称</label><input type="text" id="edit-bm-name" required>
+                <label>网址 (URL)</label><input type="url" id="edit-bm-url" required>
+                <label>自定义图标 URL</label><input type="url" id="edit-bm-icon" placeholder="留空则自动获取">
+                <label>归属分类</label><select id="edit-bm-category-select"></select>
+                <input type="text" id="edit-bm-new-category" placeholder="或输入全新的分类名称..." style="margin-top: 5px;">
+                <button type="submit" class="modal-btn-primary" style="margin-top: 15px;">保存修改</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 编辑分类悬浮窗口 (居中) -->
+    <div class="settings-modal centered-modal" id="edit-cat-modal" style="width: 300px;">
+        <div class="settings-header">
+            <h4>重命名分类</h4>
+            <button id="close-edit-cat-modal">×</button>
+        </div>
+        <div class="settings-body">
+            <form id="edit-cat-form" class="setting-item">
+                <input type="hidden" id="edit-cat-idx">
+                <label>新分类名称</label><input type="text" id="edit-cat-name" required>
+                <button type="submit" class="modal-btn-primary" style="margin-top: 15px;">确认</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- 引入拆分后的 JavaScript 模块 -->
+    <script src="js/clock.js"></script>
+    <script src="js/amap-config.js"></script>
+    <script src="js/weather.js"></script>
+    <script src="js/search.js"></script>
+    <script src="js/bookmarks.js"></script>
+    <script src="js/sidebar.js"></script>
+    <script src="js/fallback-image.js"></script>
+    <script src="js/news.js"></script>
+    <script src="js/settings.js"></script>
+    <!-- 全局体验优化与初始化 (包含背景缓存与移动端适配) -->
+    <script src="js/app.js"></script>
+</body>
+
+</html>
