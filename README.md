@@ -1,6 +1,6 @@
-# 悦页 | 茶闲时
+# 陆悦页
 
-一个借助**Gemini**和其他多种AI工具，从零开始构建的、自己个性化的浏览器主页。
+我的AI coding启蒙，一个主要借助**Gemini**从零开始构建的浏览器主页。
 
 ## ✨ 功能特性
 
@@ -25,7 +25,3 @@
 - **每日壁纸**：[Bing-Wallpaper-Action](https://github.com/zkeq/Bing-Wallpaper-Action) (Bing 每日壁纸 API 接口)
 - **图标抓取**：Google Favicon API
 - **本地渲染引擎**：HTML5 Canvas API (用于实现新闻卡片零延迟的高雅兜底文字封面)
-
-## 🙏 致谢
-
-本项目在开发过程中使用了 **Google Gemini Code Assist**、**Google Antigravity**、**Codex**、**Claude Code**等工具及其相关模型，并得到大量协助与代码启发，特此感谢。
